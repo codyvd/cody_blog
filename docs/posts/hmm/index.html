@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-05-17">
+<meta name="description" content="beginner tutorial on Hidden Markov Modeling.">
+
+<title>PSY 504 Blog - Hidden Markov Modeling</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">PSY 504 Blog</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Hidden Markov Modeling</h1>
+                  <div>
+        <div class="description">
+          beginner tutorial on Hidden Markov Modeling.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">simulations</div>
+                <div class="quarto-category">bayesian</div>
+                <div class="quarto-category">hmm</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 17, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction-to-hidden-markov-modeling" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-hidden-markov-modeling">Introduction to Hidden Markov Modeling</h2>
+<p><strong>Motivation</strong>: Hidden Markov Models are useful for when you have a sequence of observed data that is a function of unobservable states which change over time. You may be interested in estimating the state time-series which gave rise to the observations.</p>
+<p>As an example: perhaps your shopping habits change as a function of your current mood. A researcher is unable to directly observe your mood at any given moment, but they are able to observe your shopping habits over time. Perhaps you shop more when you are in a happy mood compared to a sad mood. By modeling the data using a HMM, the researcher can obtain estimates of the unobservable states and how they may be changing over time.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="hmm_example.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Moods and Shopping</figcaption><p></p>
+</figure>
+</div>
+<p>More formally, <a href="https://en.wikipedia.org/wiki/Hidden_Markov_model"><strong>Hidden Markov Models</strong></a> are models that include unobservable (i.e., <em>hidden</em>) states (<span class="math inline">\(x_1, x_2, ...x_n\)</span>) which can transition to one another over time. Each state is associated with an <em>emission model</em> (<span class="math inline">\(p(y_t|x_t,\theta)\)</span>; where <span class="math inline">\(\theta\)</span> are the parameters of the emission model) that link unobservable states (<span class="math inline">\(x_t\)</span>) to observations (<span class="math inline">\(y_t\)</span>). In particular, state transitions are assumed to satisfy the <a href="https://en.wikipedia.org/wiki/Markov_property"><strong>Markov property</strong></a> where the state model is associated with a set of parameters (<span class="math inline">\(\omega\)</span>) consisting of transition probabilities (<span class="math inline">\(\nu\)</span>) and initial state probabilities (<span class="math inline">\(\pi\)</span>). In this tutorial we explore discrete state and discrete time HMM models.</p>
+<p>Looking at the diagram: <img src="hmm_weather.png" class="img-fluid" alt="HMM Example: Weather"> The initial state probabilities (<span class="math inline">\(\pi = [0.6, 0.4]\)</span>) are denoted by the arrows from the very top pointing towards “Rainy” and “Sunny”. The transition probabilities are the arrows between the states (note: states can transition to themselves). Here the emission model is a multionomial distribution over the observable states (each hidden state has its own multinomial probability parameters) which are walking, shopping, and cleaning.</p>
+</section>
+<section id="example-switching-noisy-normal-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="example-switching-noisy-normal-distributions">Example: Switching Noisy Normal Distributions</h2>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Hidden Markov Models can be viewed as an extension of mixture models where the mixture components can switch over time (i.e., the hidden state changes over time).</p>
+<p>In this example, I will generate data from two normal distributions (each with different means, but both with variance of 1 for simplicity), where the distribution I am sampling from will change over time (based on the transition probabilities between the states). From this simulated data, I will then fit a HMM model to see how accurately it can estimate which distribution is being sampled from at each time point.</p>
+<p>To begin, here I first depict the two normal distributions which I will sample from:</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">8</span>)), <span class="fu">aes</span>(x)) <span class="sc">+</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">col=</span><span class="st">'red'</span>) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">5</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">col=</span><span class="st">'blue'</span>) <span class="sc">+</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Normal Distributions: State 1 = Red, State 2 = Blue"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/norm_dist-1.png" class="img-fluid figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see that there is overlap between the distributions, this means that estimation of which state the sampled observations come from will have uncertainty.</p>
+<p>Here I generate a sequence of observations, starting with an initial probability distribution of <span class="math inline">\(\pi = [0.5, 0.5]\)</span>, and a probability transition matrix of: <span class="math inline">\(\nu = [0.9,0.1;0.1,0.9]\)</span> (stay probability of 0.9 for both states, and switch probability of 0.1 for both states).</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">518</span>) <span class="co">#for reproducability</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># numobs</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">2</span>    <span class="co"># numstates</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>) <span class="co">#means of normal distribution</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sig <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>) <span class="co">#st devs; together these are theta, underlying parameters</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>nu <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fl">0.9</span>,<span class="fl">0.1</span>),<span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.9</span>)) <span class="co">#transition probability matrix</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>marg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>) <span class="co">#this is pi, the initial distribution</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>X.norm <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>Y.norm <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>X.norm[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>Y.norm[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>,mu[<span class="dv">1</span>],sig[<span class="dv">1</span>])</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n){</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    u <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (X.norm[i<span class="dv">-1</span>] <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        X.norm[i] <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(u <span class="sc">&gt;</span> nu[<span class="dv">1</span>,<span class="dv">1</span>],<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (X.norm[i<span class="dv">-1</span>] <span class="sc">==</span> <span class="dv">2</span>){</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        X.norm[i] <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(u <span class="sc">&gt;</span> nu[<span class="dv">2</span>,<span class="dv">2</span>],<span class="dv">1</span>,<span class="dv">2</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (X.norm[i]<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        Y.norm[i] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>,mu[<span class="dv">1</span>],sig[<span class="dv">1</span>])</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (X.norm[i]<span class="sc">==</span><span class="dv">2</span>){</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        Y.norm[i] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>,mu[<span class="dv">2</span>],sig[<span class="dv">2</span>])</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,Y.norm,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">ylab=</span> <span class="st">"y"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>ytick <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,X.norm,<span class="at">pch=</span><span class="dv">19</span>, <span class="at">ylab =</span> <span class="st">"true state"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>,<span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/sim_norm_data-1.png" class="img-fluid figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Y.norm,X.norm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Look at the top row, we see that the observations fluctuate over time according to the true underlying state/distribution I sampled from. However, just looking at the observation we aren’t able to fully tell what the underlying state is for that time-point because the distributions aren’t entirely non-overlapping (this is especially salient at the time points where there are transitions from one state to the other).</p>
+<p>Now, let’s fit a HMM model to the data.</p>
+<p>There are multiple ways to fit a HMM model to this data. One method to fit the data is called the <a href="https://en.wikipedia.org/wiki/Viterbi_algorithm">“<strong>Viterbi Algorithm</strong>”</a> which is a dynamic programming algorithm that recursively tries to calculate the optimal sequence of states (<span class="math inline">\(\hat{x}\)</span>) conditional on particular values of <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\omega\)</span> (i.e., the state model and emission model parameters). Here I condition on the true parameters.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">518</span>) <span class="co">#for reproducability</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>norm.density <span class="ot">&lt;-</span> <span class="cf">function</span>(obs,state){</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (state<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(obs,<span class="at">mean=</span>mu[<span class="dv">1</span>],<span class="at">sd=</span>sig[<span class="dv">1</span>])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (state<span class="sc">==</span><span class="dv">2</span>){</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(obs,<span class="at">mean=</span>mu[<span class="dv">2</span>],<span class="at">sd=</span>sig[<span class="dv">2</span>])</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    out</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>} <span class="co">#probability that given a state, that you got that observation y.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>delta <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>n,<span class="at">ncol=</span>m)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Initialization:</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    delta[<span class="dv">1</span>,i] <span class="ot">&lt;-</span> marg[i]<span class="sc">*</span><span class="fu">norm.density</span>(Y.norm[<span class="dv">1</span>],i)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Recursion:</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n){</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        temp <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,m)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>            temp[j] <span class="ot">&lt;-</span> delta[t<span class="dv">-1</span>,j]<span class="sc">*</span>nu[j,i]<span class="sc">*</span><span class="fu">norm.density</span>(Y.norm[t],i)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        delta[t,i] <span class="ot">&lt;-</span> <span class="fu">max</span>(temp)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Tracing Back:</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>Xhat <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>Xhat[n] <span class="ot">&lt;-</span> <span class="fu">which</span>(delta[n,]<span class="sc">==</span><span class="fu">max</span>(delta[n,]))</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> (n<span class="dv">-1</span>)<span class="sc">:</span><span class="dv">1</span>){</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    temp <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,m)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        temp[j] <span class="ot">&lt;-</span> delta[t,j]<span class="sc">*</span>nu[j,Xhat[t<span class="sc">+</span><span class="dv">1</span>]]</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    Xhat[t] <span class="ot">&lt;-</span> <span class="fu">which</span>(temp<span class="sc">==</span><span class="fu">max</span>(temp))</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="do">### checking our inferred states</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,Y.norm,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"Observed Data"</span>, <span class="at">ylab =</span> <span class="st">"observation"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,X.norm,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"True States"</span>, <span class="at">ylab =</span> <span class="st">"true state"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>,<span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,Xhat,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"Viterbi Solution"</span>, <span class="at">ylab =</span> <span class="st">"predicted state"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>,<span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Xhat[i] <span class="sc">!=</span> X.norm[i]){</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>        <span class="fu">points</span>(i,<span class="fl">1.5</span>,<span class="at">col=</span><span class="dv">2</span>,<span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/viterbi_normal-1.png" class="img-fluid figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see that the Viterbi Solution is quite accurate most of the time, with errors (time points with errors indicated as red dots) occuring close to the timepoints where the model transitioned from one state to the next. However, there are cons:</p>
+<ul>
+<li><p>The Viterbi algorithm is conditional on a set of parameters for both your emission model and state model, and in practice those are unknown.</p></li>
+<li><p>Additionally, the Viterbi algorithm calculates the optimal path <span class="math inline">\(\hat{x}\)</span>, which is only a point estimate given the observations. You may also be interested in estimating the uncertainty in <span class="math inline">\(x\)</span> as well.</p></li>
+</ul>
+<p>The second method I will present is a Bayesian approach leveraging the <a href="https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm"><strong>forward-backward</strong></a> combined with <a href="https://en.wikipedia.org/wiki/Gibbs_sampling"><strong>Gibbs Sampler</strong></a>. The forward-backward algorithm allows one to sample likely state paths (<span class="math inline">\(x\)</span>) given the observations, and from these sampled paths we are able to employ the Gibbs Sampler (a Markov-Chain-Monte-Carlo algorithm) to obtain posterior distribution samples for our parameters of interest.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">518</span>) <span class="co">#for reproducability</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>numsamp <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>X.samp <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>numsamp,<span class="at">ncol=</span>n)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>nu.samp <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>numsamp,<span class="at">ncol=</span>m<span class="sc">*</span>m)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>pi.samp <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>numsamp,<span class="at">ncol=</span>m)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>mu.samp <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>numsamp,<span class="at">ncol=</span>m)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>curnu <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fl">0.75</span>,<span class="fl">0.25</span>),<span class="fu">c</span>(<span class="fl">0.25</span>,<span class="fl">0.75</span>)) <span class="co">#specify initial values</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>curpi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>curmu <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>curX <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>norm.density <span class="ot">&lt;-</span> <span class="cf">function</span>(obs,state,mu){</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (state<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(obs,<span class="at">mean=</span>mu[<span class="dv">1</span>],<span class="at">sd=</span><span class="dv">1</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (state<span class="sc">==</span><span class="dv">2</span>){</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(obs,<span class="at">mean=</span>mu[<span class="dv">2</span>],<span class="at">sd=</span><span class="dv">1</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    out</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (iter <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>numsamp){</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Forward Algorithm ####</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    alpha <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>n,<span class="at">ncol=</span>m)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        alpha[<span class="dv">1</span>,i] <span class="ot">&lt;-</span> curpi[i]<span class="sc">*</span><span class="fu">norm.density</span>(Y.norm[<span class="dv">1</span>],i,curmu)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n){</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>            temp <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,m)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>                temp[j] <span class="ot">&lt;-</span> alpha[t<span class="dv">-1</span>,j]<span class="sc">*</span>curnu[j,i]<span class="sc">*</span><span class="fu">norm.density</span>(Y.norm[t],i,curmu)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            alpha[t,i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(temp)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Backwards Sampling ####</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    probvec <span class="ot">&lt;-</span> alpha[n,]<span class="sc">/</span><span class="fu">sum</span>(alpha[n,])</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    curX[n] <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>m,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span>probvec)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (t <span class="cf">in</span> (n<span class="dv">-1</span>)<span class="sc">:</span><span class="dv">1</span>){</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        probvec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,m)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>            probvec[i] <span class="ot">&lt;-</span> alpha[t,i]<span class="sc">*</span>curnu[i,curX[t<span class="sc">+</span><span class="dv">1</span>]]</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        probvec <span class="ot">&lt;-</span> probvec<span class="sc">/</span><span class="fu">sum</span>(probvec)</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        curX[t] <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>m,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span>probvec)</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Calculating N matrix ####</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    Nmat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow=</span>m,<span class="at">ncol=</span>m)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>            Nmat[j,k] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n){</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> (curX[t<span class="dv">-1</span>]<span class="sc">==</span>j <span class="sc">&amp;&amp;</span> curX[t]<span class="sc">==</span>k){</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>                    Nmat[j,k] <span class="ot">&lt;-</span> Nmat[j,k] <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>                }</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>        }   </span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Sampling Nu rows from Dirichlet (via Gammas) ####</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>            curnu[j,k] <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="dv">1</span>,<span class="at">shape=</span>(Nmat[j,k]<span class="sc">+</span><span class="dv">1</span>),<span class="at">rate=</span><span class="dv">1</span>)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>        curnu[j,] <span class="ot">&lt;-</span> curnu[j,]<span class="sc">/</span><span class="fu">sum</span>(curnu[j,])</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Calculating N vector ####</span></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>    Nvec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,m)</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>        Nvec[j] <span class="ot">&lt;-</span> <span class="fu">sum</span>(curX<span class="sc">==</span>j)</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>    }   </span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Sampling pi from Dirichlet (via Gammas) ####</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>        curpi[j] <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="dv">1</span>,<span class="at">shape=</span>(Nvec[j]<span class="sc">+</span><span class="dv">1</span>),<span class="at">rate=</span><span class="dv">1</span>)</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>    curpi<span class="ot">&lt;-</span> curpi<span class="sc">/</span><span class="fu">sum</span>(curpi)</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Sampling means of emission model</span></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>m){</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>        curmean <span class="ot">&lt;-</span> <span class="fu">mean</span>(Y.norm[curX<span class="sc">==</span>j])</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>        curvar <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">sum</span>(curX<span class="sc">==</span>j)</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>        curmu[j] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>,curmean,<span class="fu">sqrt</span>(curvar))</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>    }   </span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>    <span class="do">#### Storing parameter values           </span></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>    X.samp[iter,] <span class="ot">&lt;-</span> curX</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>    nu.samp[iter,] <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(curnu)</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>    pi.samp[iter,] <span class="ot">&lt;-</span> curpi</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>    mu.samp[iter,] <span class="ot">&lt;-</span> curmu</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>X.samp1 <span class="ot">&lt;-</span> X.samp</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>nu.samp1 <span class="ot">&lt;-</span> nu.samp</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>pi.samp1 <span class="ot">&lt;-</span> pi.samp</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>mu.samp1 <span class="ot">&lt;-</span> mu.samp</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a><span class="do">### re-running with different starting values</span></span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>curnu <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>),<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>))</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>curpi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.25</span>,<span class="fl">0.75</span>)</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>curmu <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>)</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>curX <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>X.samp2 <span class="ot">&lt;-</span> X.samp</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>nu.samp2 <span class="ot">&lt;-</span> nu.samp</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>pi.samp2 <span class="ot">&lt;-</span> pi.samp</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>mu.samp2 <span class="ot">&lt;-</span> mu.samp</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="co"># checking convergence using our multiple chains</span></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="co"># par(mfrow=c(3,1))</span></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>ymin<span class="ot">&lt;-</span><span class="fu">min</span>(mu.samp1[,<span class="dv">1</span>],mu.samp2[,<span class="dv">1</span>])</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>ymax<span class="ot">&lt;-</span><span class="fu">max</span>(mu.samp1[,<span class="dv">1</span>],mu.samp2[,<span class="dv">1</span>])</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(1:numsamp,mu.samp1[,1],type="l",col=2,ylim=c(ymin,ymax))</span></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="co"># lines(1:numsamp,mu.samp2[,1],col=3)</span></span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>ymin<span class="ot">&lt;-</span><span class="fu">min</span>(mu.samp1[,<span class="dv">2</span>],mu.samp2[,<span class="dv">2</span>])</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>ymax<span class="ot">&lt;-</span><span class="fu">max</span>(mu.samp1[,<span class="dv">2</span>],mu.samp2[,<span class="dv">2</span>])</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(1:numsamp,mu.samp1[,2],type="l",col=2,ylim=c(ymin,ymax))</span></span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a><span class="co"># lines(1:numsamp,mu.samp2[,2],col=3)</span></span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>ymin<span class="ot">&lt;-</span><span class="fu">min</span>(nu.samp1[,<span class="dv">2</span>],nu.samp2[,<span class="dv">2</span>])</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>ymax<span class="ot">&lt;-</span><span class="fu">max</span>(nu.samp1[,<span class="dv">2</span>],nu.samp2[,<span class="dv">2</span>])</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(1:numsamp,nu.samp1[,2],type="l",col=2,ylim=c(ymin,ymax))</span></span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a><span class="co"># lines(1:numsamp,nu.samp2[,2],col=3)</span></span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a><span class="do">### throwing out first 1000 samples as burnin and combine chains</span></span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>postburn <span class="ot">&lt;-</span> <span class="dv">1001</span><span class="sc">:</span>numsamp</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>X.samp <span class="ot">&lt;-</span> <span class="fu">rbind</span>(X.samp1[postburn,],X.samp2[postburn,])</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>mu.samp <span class="ot">&lt;-</span> <span class="fu">rbind</span>(mu.samp1[postburn,],mu.samp2[postburn,])</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>nu.samp <span class="ot">&lt;-</span> <span class="fu">rbind</span>(nu.samp[postburn,],nu.samp2[postburn,])</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>pi.samp <span class="ot">&lt;-</span> <span class="fu">rbind</span>(pi.samp1[postburn,],pi.samp2[postburn,])</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a><span class="do">### checking acf</span></span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(mu.samp[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(mu.samp[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp[,<span class="dv">3</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp[,<span class="dv">4</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(pi.samp[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(pi.samp[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a><span class="do">### thinning</span></span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(mu.samp[,<span class="dv">1</span>])<span class="sc">/</span><span class="dv">5</span>)))</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>X.samp.thin <span class="ot">&lt;-</span> X.samp[temp,]</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>mu.samp.thin <span class="ot">&lt;-</span> mu.samp[temp,]</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>nu.samp.thin <span class="ot">&lt;-</span> nu.samp[temp,]</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>pi.samp.thin <span class="ot">&lt;-</span> pi.samp[temp,]</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a><span class="do">### checking acf</span></span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(mu.samp.thin[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(mu.samp.thin[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp.thin[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp.thin[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp.thin[,<span class="dv">3</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(nu.samp.thin[,<span class="dv">4</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(pi.samp.thin[,<span class="dv">1</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(pi.samp.thin[,<span class="dv">2</span>], <span class="at">plot=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>X.final <span class="ot">&lt;-</span> X.samp.thin</span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>mu.final <span class="ot">&lt;-</span> mu.samp.thin</span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>nu.final <span class="ot">&lt;-</span> nu.samp.thin</span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>pi.final <span class="ot">&lt;-</span> pi.samp.thin</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a><span class="do">### calculating posterior probabilities of hidden states</span></span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>X.postprob <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,n)</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){  </span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>    X.postprob[j] <span class="ot">&lt;-</span> <span class="fu">sum</span>(X.final[,j]<span class="sc">==</span><span class="dv">2</span>)<span class="sc">/</span><span class="fu">length</span>(X.final[,<span class="dv">1</span>])</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">### checking our inferred states</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,Y.norm,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"Observed Data"</span>, <span class="at">ylab =</span> <span class="st">"observation"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,Xhat,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"Viterbi Solution"</span>, <span class="at">ylab =</span> <span class="st">"predicted state"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>,<span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Xhat[i] <span class="sc">!=</span> X.norm[i]){</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">points</span>(i,<span class="fl">1.5</span>,<span class="at">col=</span><span class="dv">2</span>,<span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/sim_data_plot-1.png" class="img-fluid figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,X.postprob,<span class="at">col=</span><span class="dv">4</span>,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"Posterior Probability"</span>, <span class="at">ylab =</span> <span class="st">"p(x=2)"</span>, <span class="at">xlab =</span><span class="st">"time"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>n,X.norm,<span class="at">pch=</span><span class="dv">19</span>,<span class="at">main=</span><span class="st">"True States"</span>, <span class="at">ylab =</span> <span class="st">"true state"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>,<span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/gibbs_solution_plot-1.png" class="img-fluid figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Looking at the the posterior distribution samples, we see that the model is confident for segments where the state is stable, and less confident for points where there is a transition between states. Critically, we are now able to quantify how uncertain the model is using these posterior distribtuion samples.</p>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<p>I presented a simplified example of data generated from two noisy normal distributions, but HMM are quite versatile. They are used in <a href="https://jonathan-hui.medium.com/speech-recognition-gmm-hmm-8bb5eff8b196">speech recognition</a>, part-of-speech labeling, stock market prediction (ex: bull market vs.&nbsp;bear market states), and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2766791/">gene sequence analyses</a>.</p>
+<p>In event cognition literature, HMMs have been used as an event segmentation model, classifying event boundaries as time points where there is a transition from one stable brain state to another (see this <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5558154/">paper</a>).</p>
+<p>Additionally, there are other methods for estimating HMM models such as the <a href="https://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm">Baum-Welch algorithm</a> which uses the <a href="https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm">EM</a> combined with the forward-backward algorithm.</p>
+<p>Potentially useful R packages (which I am unfamiliar with) to fit HMM Models include:</p>
+<ul>
+<li><p><a href="https://cran.r-project.org/web/packages/depmixS4/index.html">depmixS4</a></p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/seqHMM/index.html">seqHMM</a></p></li>
+</ul>
+<p>If you’re interested in depmixS4 this <a href="https://www.r-bloggers.com/2018/11/hidden-markov-model-example-in-r-with-the-depmixs4-package/">tutorial</a> which goes through a simple example may be useful. The depmixs4 package by default uses the Baum-Welch algorithm to fit HMM models.</p>
+</section>
+<section id="acknowledgements" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<p>Thanks to <a href="https://statistics.wharton.upenn.edu/profile/stjensen/">Shane Jensen</a> whose lectures and code in STAT442 (Intro to Bayesian Data Analysis) I referenced in making this blog post.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
