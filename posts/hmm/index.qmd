@@ -22,7 +22,7 @@ options(digits = 3, width = 300)
 
 ## Introduction to Hidden Markov Modeling
 
-**Motivation**: Hidden Markov Models are useful for when you have a sequence of observed data that is a function of unobservable states which change over time. You may be interested in estimating the state time-series which gave rise to the observations.
+**Motivation**: Hidden Markov Models are useful when you have a sequence of observed data that is a function of unobservable states which change over time. You may be interested in estimating the state time-series which gave rise to the observations.
 
 As an example: perhaps your shopping habits change as a function of your current mood. A researcher is unable to directly observe your mood at any given moment, but they are able to observe your shopping habits over time. Perhaps you shop more when you are in a happy mood compared to a sad mood. By modeling the data using a HMM, the researcher can obtain estimates of the unobservable states and how they may be changing over time.
 
@@ -361,11 +361,11 @@ plot(1:n,X.norm,pch=19,main="True States", ylab = "true state", xlab = "time",ya
 axis(2, at = c(1,2))
 ```
 
-Looking at the the posterior distribution samples, we see that the model is confident for segments where the state is stable, and less confident for points where there is a transition between states. Critically, we are now able to quantify how uncertain the model is using these posterior distribtuion samples.
+Looking at the the posterior distribution samples, we see that the model is confident (i.e., probabilities close to 1 or 0) for segments where the state is stable, and less confident for points where there is a transition between states. Critically, we are now able to quantify how uncertain the model is using these posterior distribution samples.
 
 ## Conclusions
 
-I presented a simplified example of data generated from two noisy normal distributions, but HMM are quite versatile. They are used in [speech recognition](https://jonathan-hui.medium.com/speech-recognition-gmm-hmm-8bb5eff8b196), part-of-speech labeling, stock market prediction (ex: bull market vs. bear market states), and [gene sequence analyses](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2766791/). 
+I presented a simplified example analyzing data generated from two noisy normal distributions, but HMM are quite versatile. They are used in [speech recognition](https://jonathan-hui.medium.com/speech-recognition-gmm-hmm-8bb5eff8b196), part-of-speech labeling, stock market prediction (ex: bull market vs. bear market states), and [gene sequence analyses](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2766791/). 
 
 In event cognition literature, HMMs have been used as an event segmentation model, classifying event boundaries as time points where there is a transition from one stable brain state to another (see this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5558154/)). 
 

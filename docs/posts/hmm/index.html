@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.2.335">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -211,7 +211,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="introduction-to-hidden-markov-modeling" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-to-hidden-markov-modeling">Introduction to Hidden Markov Modeling</h2>
-<p><strong>Motivation</strong>: Hidden Markov Models are useful for when you have a sequence of observed data that is a function of unobservable states which change over time. You may be interested in estimating the state time-series which gave rise to the observations.</p>
+<p><strong>Motivation</strong>: Hidden Markov Models are useful when you have a sequence of observed data that is a function of unobservable states which change over time. You may be interested in estimating the state time-series which gave rise to the observations.</p>
 <p>As an example: perhaps your shopping habits change as a function of your current mood. A researcher is unable to directly observe your mood at any given moment, but they are able to observe your shopping habits over time. Perhaps you shop more when you are in a happy mood compared to a sad mood. By modeling the data using a HMM, the researcher can obtain estimates of the unobservable states and how they may be changing over time.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -591,11 +591,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<p>Looking at the the posterior distribution samples, we see that the model is confident for segments where the state is stable, and less confident for points where there is a transition between states. Critically, we are now able to quantify how uncertain the model is using these posterior distribtuion samples.</p>
+<p>Looking at the the posterior distribution samples, we see that the model is confident (i.e., probabilities close to 1 or 0) for segments where the state is stable, and less confident for points where there is a transition between states. Critically, we are now able to quantify how uncertain the model is using these posterior distribution samples.</p>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
-<p>I presented a simplified example of data generated from two noisy normal distributions, but HMM are quite versatile. They are used in <a href="https://jonathan-hui.medium.com/speech-recognition-gmm-hmm-8bb5eff8b196">speech recognition</a>, part-of-speech labeling, stock market prediction (ex: bull market vs.&nbsp;bear market states), and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2766791/">gene sequence analyses</a>.</p>
+<p>I presented a simplified example analyzing data generated from two noisy normal distributions, but HMM are quite versatile. They are used in <a href="https://jonathan-hui.medium.com/speech-recognition-gmm-hmm-8bb5eff8b196">speech recognition</a>, part-of-speech labeling, stock market prediction (ex: bull market vs.&nbsp;bear market states), and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2766791/">gene sequence analyses</a>.</p>
 <p>In event cognition literature, HMMs have been used as an event segmentation model, classifying event boundaries as time points where there is a transition from one stable brain state to another (see this <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5558154/">paper</a>).</p>
 <p>Additionally, there are other methods for estimating HMM models such as the <a href="https://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm">Baum-Welch algorithm</a> which uses the <a href="https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm">EM</a> combined with the forward-backward algorithm.</p>
 <p>Potentially useful R packages (which I am unfamiliar with) to fit HMM Models include:</p>
